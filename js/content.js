@@ -4,7 +4,7 @@
  * This file is the single source of truth for every piece of text on the page.
  * Edit, reorder, add or remove text here only; no other file needs to change.
  *
- * site  : page title and footer line. (An optional `subtitle` is also supported and
+ * site  : page title, footer line and credit line (`credit`, shown under the footer; empty or missing = hidden). (An optional `subtitle` is also supported and
  *         shown under the title if present; by default there is none.)
  * items : one entry per hotspot. The `id` must match a part of the bucket
  *         (lid, plate, body, bran, fresh, fermenting, finished, tray, leachate, tap, jar).
@@ -30,7 +30,8 @@
 window.BOKASHI_CONTENT = {
   site: {
     title: "Inside a Bokashi Bucket",
-    footer: "Timings and ratios are typical guidelines. Always follow the instructions of your bran manufacturer."
+    footer: "Timings and ratios are typical guidelines. Always follow the instructions of your bran manufacturer.",
+    credit: "Final Project for UC Berkeley ESPM-98-GRP-007 Fall 2026"   // small line under the footer; leave empty "" to hide it
   },
 
   labels: {

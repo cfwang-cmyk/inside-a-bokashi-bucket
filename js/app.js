@@ -77,6 +77,9 @@ const ILLUSTRATIONS = {
   document.querySelector(".site-header").classList.toggle("has-subtitle", !!site.subtitle);
   $("#scene-hint").textContent = labels.sceneHint || "";
   $("#site-footer").textContent = site.footer || "";
+  const creditEl = $("#site-credit");
+  creditEl.textContent = site.credit || "";
+  creditEl.hidden = !site.credit;
   sceneEl.setAttribute("aria-label", labels.sceneDescription || site.title || "");
 
   /* ---------- scene ---------- */
