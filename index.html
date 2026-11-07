@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <h1 class="site-title" id="site-title"></h1>
+      <p class="site-subtitle" id="site-subtitle" hidden></p>
+    </header>
+
+    <main class="stage" id="stage">
+      <div class="scene-wrap">
+        <div class="scene" id="scene" role="img" aria-label="" aria-describedby="scene-hint"></div>
+        <p class="sr-only" id="scene-hint"></p>
+      </div>
+
+      <section class="info" id="info">
+        <div class="panel overview is-shown" id="overview">
+          <ol class="cards" id="cards"></ol>
+        </div>
+        <div class="panel detail" id="detail" aria-live="polite"></div>
+      </section>
+
+      <svg class="connectors" id="connectors" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="pencil" filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="4" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+        <g id="connector-lines" filter="url(#pencil)"></g>
+      </svg>
+    </main>
+
+    <footer class="site-footer">
+      <p id="site-footer"></p>
+    </footer>
+  </div>
+
+  <script src="js/content.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
