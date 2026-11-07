@@ -2,7 +2,9 @@
    All numbers are percentages of the 896x1200 frame of master.jpg, so the scene scales fluidly.
    layers: bottom to top. x/y/w/h = layer box. clip = CSS clip-path polygon (in % of the layer box).
    shape = simplified alpha outline (in % of the layer box), used only by the file:// hit-test fallback.
-   anchors: where each hotspot's connector line starts. */
+   anchors: where each hotspot's connector line starts.
+   (leachate: centre of the opaque area of the RIGHT liquid piece, so its line exits right past the bucket wall
+    without crossing the tap or the jar; hovering either liquid piece still activates the whole hotspot.) */
 const SCENE = {
  aspect: [896, 1200],
  layers: [
@@ -21,7 +23,7 @@ const SCENE = {
   {"id":"plate","src":"assets/press-plate.png","hotspot":"plate","x":23.326,"y":20.167,"w":53.46,"h":8.0,"shape":[[0.0,53.1],[4.8,71.9],[11.1,80.2],[35.7,90.6],[37.4,99.0],[66.4,99.0],[68.1,90.6],[90.6,78.1],[99.8,56.2],[96.7,32.3],[82.5,15.6],[63.9,8.3],[62.2,0.0],[37.8,0.0],[36.1,8.3],[12.3,17.7],[2.7,31.2]]},
   {"id":"lid","src":"assets/lid.png","hotspot":"lid","x":17.634,"y":6.333,"w":64.955,"h":13.75,"shape":[[0.0,60.0],[2.1,70.9],[9.3,81.8],[38.8,94.5],[40.2,99.4],[57.4,99.4],[58.8,94.5],[81.6,87.9],[93.6,78.2],[99.8,63.6],[96.7,51.5],[95.7,37.6],[92.1,29.7],[78.4,19.4],[60.0,15.2],[52.4,0.0],[46.9,0.0],[40.0,14.5],[19.8,20.0],[8.9,28.5],[5.0,35.2],[3.1,50.9]]}
  ],
- anchors: {"lid": [73.88, 13.33], "plate": [71.43, 25.0], "bran": [68.3, 28.5], "body": [78.01, 33.67], "fresh": [65.29, 37.33], "fermenting": [66.52, 51.83], "finished": [67.63, 64.33], "tray": [70.09, 70.67], "tap": [50.45, 76.0], "leachate": [34.82, 79.17], "jar": [54.91, 90.83]}
+ anchors: {"lid": [73.88, 13.33], "plate": [71.43, 25.0], "bran": [68.3, 28.5], "body": [78.01, 33.67], "fresh": [65.29, 37.33], "fermenting": [66.52, 51.83], "finished": [67.63, 64.33], "tray": [70.09, 70.67], "tap": [50.45, 76.0], "leachate": [65.0, 82.9], "jar": [54.91, 90.83]}
 };
 
 /* Detail-view illustrations per hotspot (paths only; alt text comes from content.js titles). */
@@ -180,10 +182,37 @@ const ILLUSTRATIONS = {
         maps.push({ def, alpha });
       }
       hitMaps = maps; hitMode = "alpha";
+      checkConnectorRuns();
     } catch (e) {
       hitMaps = null; hitMode = "shape";
     }
     document.documentElement.dataset.hitMode = hitMode;
+  }
+  /* Safety check (dev aid): the first horizontal run of each connector goes from its anchor to the right,
+     out past the bucket. Warn in the console if that run crosses the opaque pixels (alpha > 30) of another
+     hotspot's layers. The bucket body is skipped, since every interior line must exit through its wall,
+     and decorative layers (the food fill) are not hotspots. Anchors are never changed automatically. */
+  function checkConnectorRuns() {
+    if (!hitMaps) return;
+    const found = [];
+    Object.keys(SCENE.anchors).forEach(id => {
+      if (!byId.has(id)) return;
+      const [u, v] = SCENE.anchors[id];
+      const py = Math.min(HIT_H - 1, Math.max(0, Math.round(v / 100 * HIT_H)));
+      const x0 = Math.max(0, Math.round(u / 100 * HIT_W));
+      const hits = new Set();
+      hitMaps.forEach(m => {
+        const hs = m.def.hotspot;
+        if (m.def.decor || !hs || hs === id || hs === "body") return;
+        for (let px = x0; px < HIT_W; px++) {
+          if (m.alpha[py * HIT_W + px] > 30) { hits.add(hs); break; }
+        }
+      });
+      if (hits.size) found.push([id, [...hits]]);
+    });
+    found.forEach(([id, others]) =>
+      console.warn("[bokashi] connector run for \"" + id + "\" crosses other hotspot artwork: " + others.join(", ")));
+    window.__connectorRunCheck = found;   // for QA scripts
   }
   function inPoly(px, py, pts) {
     let inside = false;
