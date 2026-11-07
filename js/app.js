@@ -50,6 +50,7 @@ const ILLUSTRATIONS = {
   const labels = C.labels || {};
   const items = Array.isArray(C.items) ? C.items : [];
   const byId = new Map(items.map(it => [it.id, it]));
+  const sourcesList = (C.sourcesList && typeof C.sourcesList === "object") ? C.sourcesList : {};
 
   const $ = sel => document.querySelector(sel);
   const sceneEl = $("#scene");
@@ -280,6 +281,25 @@ const ILLUSTRATIONS = {
     detailEl.appendChild(section(labels.tips, null, it.tips));
     (Array.isArray(it.extra) ? it.extra : []).forEach(x => detailEl.appendChild(section(x.heading, x.paragraphs, x.bullets)));
     if (it.note) detailEl.appendChild(el("p", "detail-note", it.note));
+    const srcs = (Array.isArray(it.sources) ? it.sources : []).map(k => sourcesList[k]).filter(x => x && x.url);
+    if (srcs.length) {
+      const box = el("section", "detail-sources");
+      const hs = el("h3", "sources-heading", labels.sources || "");
+      hs.id = "detail-sources-heading";
+      box.setAttribute("aria-labelledby", hs.id);
+      const ul = el("ul");
+      srcs.forEach(x => {
+        const li = el("li");
+        const a = el("a", null, x.label || x.url);
+        a.href = x.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      box.append(hs, ul);
+      detailEl.appendChild(box);
+    }
     detailEl.scrollTop = 0;
     detailEl.classList.remove("is-scrolled");
   }
